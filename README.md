@@ -1,23 +1,23 @@
-# mai-streaming# 🧠 MAI CLI Pipeline
+# mai-streaming# MAI CLI Pipeline
 
 Extract and ingest network traffic using `mai`, Elasticsearch, and Click.
 
-## ✅ Requirements
+## Requirements
 
 - Python 3.8+
 - TWC installed in PATH
 - Elasticsearch running locally or remote
 
-## ⚙️ Setup
+## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🚀 Usage
+## Usage
 
 ```bash
-python cli.py offline --pcap-dir /path/to/pcaps
-python cli.py live --interface eth0
+python cli.py offline /path/to/pcaps
+python cli.py live eth0 /path/to/output
 
 ```
