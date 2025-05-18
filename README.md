@@ -17,5 +17,7 @@ pip install -r requirements.txt
 ## 🚀 Usage
 
 ```bash
-mai-streaming offline --pcap-dir /path/to/pcap/folder --output-dir /path/to/output/folder
+python cli.py offline --pcap-dir /path/to/pcaps
+python cli.py live --interface eth0
+
 ```
