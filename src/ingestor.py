@@ -2,13 +2,14 @@ import os
 import pandas as pd
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+import glob
 
 processed_marker = ".processed"
 
 def csv_to_es(es, index, csv_file):
     col = ['sip', 'sport', 'dip', 'dport', 'proto', 'first_timestamp',
        'total_time', 'sni', 'vpn', 'dd', 'default_vpn',
-       'dn', 'dns', 'ds', 'application', 'dl', 'traffic_type']
+       'dn', 'dns', 'ds', 'application', 'traffic_type']
     df = pd.read_csv(csv_file, usecols=col)
     df["source_file"] = os.path.basename(csv_file)
     df["ingested_at"] = datetime.utcnow().isoformat()
@@ -23,14 +24,18 @@ def csv_to_es(es, index, csv_file):
 
     if actions:
         helpers.bulk(es, actions)
-        print(f"[✓] Ingested {len(actions)} from {csv_file}")
+        print(f"Ingested {len(actions)} from {csv_file}")
 
-def ingest_output_folder(folder, es_url="http://localhost:9200", index="twc-streaming"):
+def ingest_output_folder(folder, es_url="http://localhost:9200", index="twc-streaming4"):
     es = Elasticsearch(es_url,
         api_key=None,  # if you're not using API key authentication
         verify_certs=False,
         request_timeout=30
     )
+    files = glob.glob(os.path.join(folder, '**/*.csv'), recursive=True)
+    dfs = [pd.read_csv(file) for file in files]
+    df = pd.concat(dfs, ignore_index=True)
+    df.to_csv(os.path.join(folder, "twc_test_data.csv"), index=False)
     for file in os.listdir(folder):
         if file.endswith(".csv"):
             filepath = os.path.join(folder, file)
@@ -40,4 +45,4 @@ def ingest_output_folder(folder, es_url="http://localhost:9200", index="twc-stre
                     csv_to_es(es, index, filepath)
                     open(done_flag, "w").close()
                 except Exception as e:
-                    print(f"[!] Failed to ingest {file}: {e}")
+                    print(f"Failed to ingest {file}: {e}")
